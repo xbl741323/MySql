@@ -1,1 +1,139 @@
-开始MySQL的完善学习了
+开始MySQL的完善学习了!
+以下数据库名统一用study_db  表名用user
+
+1、初识MySQL
+show databases; -- 查看所有数据库
+use study_db; -- 切换数据库 use 数据库名
+show tables; -- 查看数据库中所有的表
+describe user; -- 显示对应表的信息
+create database study_db; -- 创建一个数据库
+exit; -- 退出连接
+-- 单行注释
+/* */ 多行注释
+
+数据库 xxx 语言 CRUD 增删改查！
+DDL 定义
+DML 操作
+DQL 查询
+DCL 控制
+
+2、操作数据库
+操作数据库->操作数据库中的表->操作数据库中表的数据
+MySQL关键字不区分大小写
+2.1、创建数据库
+CREATE DATABASE [IF NOT EXISTS] study_db;
+2.2、删除数据库
+DROP DATABASE [IF EXISTS] study_db;
+2.3、使用数据库
+USE study_db;
+2.4、查看数据库
+SHOW DATABASES;
+
+3、数据库的列类型
+数值
+ tinyint 十分小的数据 1个字节
+ smallint 较小的数据 2个字节
+ mediumint 中等大小的数据 3个字节
+ int 标准的整数 4个字节
+ bigint 较大的数据 8个字节
+ float 浮点数 4个字节
+ double 浮点数 8个字节
+ decimal 字符串形式的浮点数 金融计算的时候，一般是使用decimal
+
+字符串
+ char 字符串固定大小的 0-255
+ varchar 可变字符串 0-65535    常用的变量 String
+ tinytext 微型文本 2^8 - 1
+ text 文本串 2^16 - 1
+
+时间日期
+ java.util.Date
+ date YYYY-MM-DD 日期格式
+ time HH:mm:ss 时间格式
+ datetime YYYY-MM-DD HH:mm:ss 最常用的时间格式  最常用的时间格式
+ timestamp 时间戳 1970.1.1到现在的毫秒数！也较为常用
+ year 年份表示
+
+null
+ 没有值，未知
+ ==注意，不要使用NULL进行运算，结果为NULL
+
+4、数据库的字段属性（重点）
+Unsigned:
+ 无符号的整数
+ 声明了该列不能声明为负数
+
+zerofill：
+ 0填充的
+ 不足的位数，使用0来填充
+
+自增：
+ 通常理解为自增，自动在上一条记录的基础上+1（默认） 
+ 通常用来设计唯一的主键~index，必须是整数类型
+ 可以自定义设计主键自增的起始值和步长
+
+非空 NULL not null
+ 假设设置为 not null ，如果不给它赋值，就会报错
+ NULL，如果不填写值，默认就是null！
+
+默认：
+ 设置默认的值！
+ sex，默认值为男，如果不指定该列的值 ，则会有默认的值！
+
+拓展：每一个表，都必须存在以下5个字段！未来做项目用的，表示一个记录存在的意义
+id：主键
+version：乐观锁
+is_delete：伪删除
+gmt_create：创建时间
+gmt_update：修改时间
+
+5、MySQL数据管理
+5.1 外键（了解即可，不建议使用，避免数据库过多造成困扰）
+
+5.2 DML语言（全部记住）
+
+5.3 添加
+
+5.4 修改
+
+5.5 删除
+
+6、DQL查询数据（最重点）
+6.1（Data Query LANGUAGE：数据查询语言）
+ 所有的查询操作都用它，SELECT
+-- 别名，给结果起一个名字， AS 可以给字段起别名，也可以给表起别名
+-- 函数 CONCAT('姓名：'，name) AS 新名字 FROM user;
+-- distinct 去重，重复的数据只显示一条
+
+6.2 where 条件子句
+作用：检索数据中符合条件的值
+搜索的条件由一个或多个表达式组成
+逻辑运算符（尽量使用英文字母）
+and  &&                    a and b   a&&b                        逻辑与，同真为真
+or  ||                           a or b   a||b                              逻辑或，有真为真
+Not  !                         not a   !a                                  逻辑非，真为假，假为真
+
+6.3 模糊查询：比较运算符
+运算符                                  语法                                   描述
+IS NULL                               a is null                              a为null,结果为真
+IS NOT NULL                       a is not null                        a不为null,结果为真
+BETWEEN                            a between b and c             若 a 在 b 和 c 之间，则结果为真
+LIKE                                     a like b                              若SQL匹配，如果a匹配b，则结果为真
+IN                                        a in (a1,a2,a3)                    若a在a1,a2..中则结果为真
+
+LIKE '刘%' --查询姓首字为刘的同学    %(代表0到任意个字符）
+LIKE '刘_' --查询姓刘的同学，名字后面只有一个字的   _(一个代表一个字符)
+
+6.4 连表查询
+-- join（连接的表） on（判断的条件）连接查询
+-- where 等值查询
+
+LEFT JOIN
+RIGHT JOIN
+INNER JOIN（一般简写为JOIN）
+
+连表查询思路：
+1、分析需求，分析查询的字段来自哪些表
+2、确定使用哪种连接查询？共有7种
+3、确定交叉点（这些表中哪些数据是相同的）
+4、判断的条件有哪些
