@@ -93,10 +93,11 @@ gmt_update：修改时间
 5.2 DML语言（全部记住）
 
 5.3 添加
-
+insert into user (name,age) values ("zs",23); 
 5.4 修改
-
+update user set name = "ls" where id = 2;
 5.5 删除
+delete from user where id = 1;
 
 6、DQL查询数据（最重点）
 6.1（Data Query LANGUAGE：数据查询语言）
@@ -104,6 +105,8 @@ gmt_update：修改时间
 -- 别名，给结果起一个名字， AS 可以给字段起别名，也可以给表起别名
 -- 函数 CONCAT('姓名：'，name) AS 新名字 FROM user;
 -- distinct 去重，重复的数据只显示一条
+select concat('1',name) as title from user;
+select distinct name  from user;
 
 6.2 where 条件子句
 作用：检索数据中符合条件的值
@@ -127,6 +130,7 @@ LIKE '刘_' --查询姓刘的同学，名字后面只有一个字的   _(一个代表一个字符)
 6.4 连表查询
 -- join（连接的表） on（判断的条件）连接查询
 -- where 等值查询
+select p.pname,g.gname from player as p left join game as g on p.id = g.id where g.name is null; 
 
 LEFT JOIN
 RIGHT JOIN
@@ -137,3 +141,78 @@ INNER JOIN（一般简写为JOIN）
 2、确定使用哪种连接查询？共有7种
 3、确定交叉点（这些表中哪些数据是相同的）
 4、判断的条件有哪些
+
+7、分页和排序
+LIMIT --分页  （a，b）  a 起始位置 b多少条
+select * from user limit 0,5；
+
+ORDER BY --排序        DESC降序   ASC升序
+select * from user order by desc limit 0,5;
+
+8、子查询和嵌套查询
+where (这个值是计算出来的)
+本质：在where中嵌套一个查询语句
+
+9、MySQL函数（常用）
+......
+常用函数及用法（见官网https://dev.mysql.com/doc/refman/8.0/en/numeric-functions.html）
+
+聚合函数
+函数名称                                        描述
+COUNT()                                       计数
+SUM()                                           求和
+AVG()                                            平均值
+MAX()                                           最大值
+MIN()                                            最大值
+
+select count(name)  from user; -- count(字段)，会忽略所有的null值
+select count(*) from user; -- 不会忽略null值，本质计算行数
+select count(1) from user; -- 不会忽略null值
+select max(age),min(age),avg(age) from player;
+select g.name,max(p.age),min(p.age),avg(p.age) from player as p left join game as g on p.gid = g.id group by g.id;
+select g.name,max(p.age),min(p.age) as 平均值,avg(p.age) from player as p left join game as g on p.gid = g.id group by g.id having 平均值 > 18;
+
+注意：调用的级别顺序
+select...
+from ... as...
+left join...
+where...
+group by...
+having...（分组过滤：having跟在group by后面）
+order by...
+limit...
+
+10、数据库级别的MD5加密（拓展）
+什么是MD5？
+主要是增强语法复杂度和不可逆性
+MD5不可逆，具体值的MD5是一样的
+MD5破解网站的原理，背后有一个字典，根据MD5加密后的值查找加密的前值（所以复杂的密码，破解不了）
+update player set name = md5(name) where uid = 101; name是字符串类型
+MD5加密后的数据只能比较不能破解
+
+11、事务
+什么是事务？
+要么都成功 ，要么都失败（银行转账是最好的事务举例）
+1、SQL执行  A给B转账   A1000     ->200（转200）     B200
+1、SQL执行  B收到给A的钱   A800     ->     B400
+将一组SQL放在一个批次中去执行
+
+事务原则：ACID原则
+原子性（Atomicity）
+原子性是指事务是一个不可分割的工作单位，事务中的操作要么全部成功，要么全部失败。比如在同一个事务中的SQL语句，要么全部执行成功，要么全部执行失败。
+
+一致性（Consistency）
+官网上事务一致性的概念是：事务必须使数据库从一个一致性状态变换到另外一个一致性状态。
+换一种方式理解就是：事务按照预期生效，数据的状态是预期的状态。
+举例说明：张三向李四转100元，转账前和转账后的数据是正确的状态，这就叫一致性，如果出现张三转出100元，李四账号没有增加100元这就出现了数据错误，就没有达到一致性。
+
+隔离性（Isolation）
+事务的隔离性是多个用户并发访问数据库时，数据库为每一个用户开启的事务，不能被其他事务的操作数据所干扰，多个并发事务之间要相互隔离。
+
+持久性（Durability）
+持久性是指一个事务一旦被提交，它对数据库中数据的改变就是永久性的，接下来即使数据库发生故障也不应该对其有任何影响。
+例如我们在使用JDBC操作数据库时，在提交事务方法后，提示用户事务操作完成，当我们程序执行完成直到看到提示后，就可以认定事务以及正确提交，即使这时候数据库出现了问题，也必须要将我们的事务完全执行完成，否则就会造成我们看到提示事务处理完毕，但是数据库因为故障而没有执行事务的重大错误。
+
+脏读（指一个事务读取了另外一个事务未提交的数据）
+不可重复读（指在一个事务内读取表中的某一行数据，多次读取结果不同，这个不一定是错误，只是某些场合不对）
+虚读（又称幻读，是指一个事务内读取到了别的事务插入的数据，导致前后读取不一致，一般是行影响，多了一行）
